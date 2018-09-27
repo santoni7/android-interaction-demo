@@ -1,0 +1,1 @@
+include ':interactiondemo-a', ':interactiondemo-common-lib', ':interactiondemo-b'
