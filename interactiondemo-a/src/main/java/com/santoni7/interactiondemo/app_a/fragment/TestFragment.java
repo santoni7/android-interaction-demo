@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.santoni7.interactiondemo.app_a.R;
-import com.santoni7.interactiondemo.app_a.activity.MainContract;
+import com.santoni7.interactiondemo.app_a.activity.ContractA;
 import com.santoni7.interactiondemo.app_a.base.FragmentBase;
 
 import butterknife.BindView;
@@ -18,7 +18,7 @@ import butterknife.OnClick;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TestFragment extends FragmentBase<MainContract.Presenter> implements MainContract.View.TestView {
+public class TestFragment extends FragmentBase<ContractA.Presenter> implements ContractA.View.TestView {
 
     @BindView(R.id.btnOk) Button okButton;
     @BindView(R.id.editText) EditText editText;

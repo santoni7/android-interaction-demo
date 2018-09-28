@@ -14,12 +14,7 @@ import io.reactivex.Observable;
 
 public class LinkRepository {
     private ImageLinkDao dao;
-    public static final Comparator<ImageLink> COMPARATOR_BY_DATE = (a, b) -> b.getTimestamp().compareTo(a.getTimestamp());
-    public static final Comparator<ImageLink> COMPARATOR_BY_STATUS =
-            (a, b) -> {
-                int x = a.getStatus().getCode() - b.getStatus().getCode();
-                return x != 0 ? x : COMPARATOR_BY_DATE.compare(a, b);
-            };
+
 
 
     public LinkRepository(ImageLinkDatabase database) {
@@ -30,7 +25,7 @@ public class LinkRepository {
         return dao;
     }
 
-    public Flowable<List<ImageLink>> getLinksSorted(Comparator<ImageLink> comparator) {
+    public Flowable<List<ImageLink>> getSortedLinks(Comparator<ImageLink> comparator) {
         return dao.getLinksFlowable()
                 .map(links -> {
                     Collections.sort(links, comparator);

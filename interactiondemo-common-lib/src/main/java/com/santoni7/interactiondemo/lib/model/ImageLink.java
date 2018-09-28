@@ -9,16 +9,22 @@ import android.content.ContentValues;
 import com.santoni7.interactiondemo.lib.converters.DateConverter;
 import com.santoni7.interactiondemo.lib.converters.StatusConverter;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
 @Entity(tableName = ImageLink.TABLE_NAME)
 public class ImageLink {
+    /**
+     * Database info:
+     */
     public static final String TABLE_NAME = "Links";
     public static final String COLUMN_ID = "linkId";
     public static final String COLUMN_URL = "url";
     public static final String COLUMN_STATUS = "status";
     public static final String COLUMN_TIMESTAMP = "timestamp";
+
+
 
     public enum Status {
         LOADED(1), ERROR(2), UNKNOWN(3);
@@ -32,6 +38,9 @@ public class ImageLink {
         }
     }
 
+    /**
+     * Fiel
+     */
     @PrimaryKey(autoGenerate = true)
     private long linkId;
 

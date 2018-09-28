@@ -2,8 +2,6 @@ package com.santoni7.interactiondemo.app_a.base;
 
 import android.support.v4.app.Fragment;
 
-import com.santoni7.interactiondemo.app_a.activity.MainActivity;
-import com.santoni7.interactiondemo.app_a.activity.MainContract;
 import com.santoni7.interactiondemo.lib.mvp.MvpPresenter;
 
 public abstract class FragmentBase<P extends MvpPresenter> extends Fragment {

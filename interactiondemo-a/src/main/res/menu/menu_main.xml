@@ -1,10 +1,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".app_a.main.MainActivity">
+    tools:context=".activity.ActivityA">
+    <!--<item-->
+    <!--android:id="@+id/action_settings"-->
+    <!--android:orderInCategory="100"-->
+    <!--android:title="@string/action_settings"-->
+    <!--app:showAsAction="never" />-->
+    <!--android:icon="@mipmap/ic_launcher_round"-->
+
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_change_order"
+        android:icon="@mipmap/icon_sort"
+        android:title="@string/order_by"
+        app:showAsAction="always">
+        <menu>
+            <group>
+                <item
+                    android:id="@+id/action_order_by_date"
+                    android:title="@string/order_newer_first" />
+                <item
+                    android:id="@+id/action_order_by_date_reversed"
+                    android:title="@string/order_older_first" />
+                <item
+                    android:id="@+id/action_order_by_status"
+                    android:title="@string/order_by_status" />
+            </group>
+        </menu>
+
+    </item>
 </menu>

@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">App B: Interaction Demo</string>
+    <string name="app_name">App B - Interaction Demo</string>
+    <string name="app_title">App B</string>
+    <string name="app_subtitle">Cross-App Interaction Demo</string>
+    <string name="countdown_alert_text">App B is dependent on App A, and should not be launched by user. It will close in 10 seconds.</string>
+    <string name="ok">OK</string>
+    <string name="countdown_text_format">%1$d</string>
+    <string name="app_will_be_closed_in">App will be closed in:</string>
+    <string name="goodbye">Goodbye!</string>
 </resources>
