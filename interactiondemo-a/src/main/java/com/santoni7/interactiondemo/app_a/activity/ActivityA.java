@@ -2,6 +2,9 @@ package com.santoni7.interactiondemo.app_a.activity;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +30,10 @@ import com.santoni7.interactiondemo.app_a.fragment.TestFragment;
 import com.santoni7.interactiondemo.app_a.data.ImageLinkDatabase;
 import com.santoni7.interactiondemo.lib.AndroidUtils;
 import com.santoni7.interactiondemo.app_a.ImageLinkOrder;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,6 +61,21 @@ public class ActivityA extends BaseActivity implements ContractA.View {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: savedInstanceState=" + savedInstanceState);
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler((paramThread, paramThrowable) -> {
+            Toast.makeText(ActivityA.this, "Error log copied to clipboard",Toast.LENGTH_LONG).show();
+            Log.e("Alert","Lets See if it Works !!!");
+
+            Writer writer = new StringWriter();
+            paramThrowable.printStackTrace(new PrintWriter(writer));
+            String stacktrace = writer.toString();
+
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText(paramThrowable.getMessage(), stacktrace);
+            if (clipboard != null) {
+                clipboard.setPrimaryClip(clip);
+            }
+        });
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 

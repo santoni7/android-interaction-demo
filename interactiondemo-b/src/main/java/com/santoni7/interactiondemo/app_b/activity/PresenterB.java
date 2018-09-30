@@ -1,21 +1,24 @@
 package com.santoni7.interactiondemo.app_b.activity;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
-import com.santoni7.interactiondemo.app_b.LinkContentRepository;
-import com.santoni7.interactiondemo.app_b.RemoteImageDataSource;
+import com.santoni7.interactiondemo.app_b.Constants;
+import com.santoni7.interactiondemo.app_b.R;
+import com.santoni7.interactiondemo.app_b.data.LinkContentRepository;
+import com.santoni7.interactiondemo.app_b.data.RemoteImageDataSource;
 import com.santoni7.interactiondemo.lib.model.ImageLink;
 import com.santoni7.interactiondemo.lib.mvp.PresenterBase;
 
 import java.util.Calendar;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.Nullable;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class PresenterB extends PresenterBase<ContractB.View> implements ContractB.Presenter {
+
+
     private LinkContentRepository repository;
     private RemoteImageDataSource imageDataSource;
 
@@ -38,21 +41,34 @@ public class PresenterB extends PresenterBase<ContractB.View> implements Contrac
         imageLink.setUrl(url);
         imageLink.setStatus(ImageLink.Status.UNKNOWN);
 
-        long id = repository.insert(imageLink);
-        imageLink.setLinkId(id);
-
-        loadAndDisplayImage(imageLink);
+        disposables.add(repository.insert(imageLink)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(id -> {
+                    imageLink.setLinkId(id);
+                    loadAndDisplayImage(imageLink);
+                }, err -> {
+                    getView().errorMessage(R.string.error_while_inserting);
+                }));
     }
 
 
     @Override
     public void onActionOpenLink(long id) {
-        final ImageLink imageLink = repository.select(id);
-        if (imageLink.getStatus() == ImageLink.Status.LOADED) {
-            // todo schedule image download and imagelink delete from DB
+        disposables.add(repository.select(id)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(imageLink -> {
+                    // Schedule remove link with "green" status
+                    if (imageLink.getStatus() == ImageLink.Status.LOADED) {
+                        Log.d("PresenterB", "Scheduled service execution for id=" + id + "; link=" + imageLink);
 
-        }
-        loadAndDisplayImage(imageLink);
+                        getView().scheduleDeleteLink(imageLink, Constants.SERVICE_EXECUTION_DELAY_MS);
+                        getView().scheduleDownloadImage(imageLink, Constants.IMAGE_SAVE_PATH, Constants.SERVICE_EXECUTION_DELAY_MS);
+                        getView().snackbarOk("Service scheduled.");
+                    }
+                    loadAndDisplayImage(imageLink);
+                }, err -> {
+                    getView().errorMessage(R.string.error_fetching_link_from_db);
+                }));
     }
 
     private void loadAndDisplayImage(ImageLink imageLink) {
@@ -70,13 +86,21 @@ public class PresenterB extends PresenterBase<ContractB.View> implements Contrac
             imageLink.setStatus(ImageLink.Status.ERROR);
         }
 
-        repository.update(imageLink);
         getView().displayData(imageLink, bitmap);
+
+        // todo subscribe and display success/error messages
+        disposables.add(repository.update(imageLink)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((affected, err) -> {
+                    if (affected == 0 || err != null){
+                        getView().errorMessage(R.string.error_updating_link);
+                    }
+                }));
     }
 
     @Override
     public void destroy() {
-        super.destroy();
         disposables.clear();
+        super.destroy();
     }
 }

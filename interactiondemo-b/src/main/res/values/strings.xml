@@ -2,9 +2,17 @@
     <string name="app_name">App B - Interaction Demo</string>
     <string name="app_title">App B</string>
     <string name="app_subtitle">Cross-App Interaction Demo</string>
-    <string name="countdown_alert_text">App B is dependent on App A, and should not be launched by user. It will close in 10 seconds.</string>
+    <string name="countdown_alert_text">App B should not be launched manually. Open App A instead. </string>
     <string name="ok">OK</string>
     <string name="countdown_text_format">%1$d</string>
     <string name="app_will_be_closed_in">App will be closed in:</string>
     <string name="goodbye">Goodbye!</string>
+
+    <string name="channel_name">App B Notification Channel</string>
+    <string name="channel_description">Service notifications</string>
+    <string name="close_now">Close Now</string>
+    <string name="error_while_inserting">An error occured while inserting link into database.</string>
+    <string name="error_fetching_link_from_db">Could not get link from database</string>
+    <string name="error_updating_link">Error while updating link status in database</string>
+    <string name="error_wrong_action">Error: Wrong action provided.</string>
 </resources>

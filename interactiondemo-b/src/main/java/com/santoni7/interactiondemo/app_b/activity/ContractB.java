@@ -14,6 +14,14 @@ public class ContractB {
         void hideProgressBar();
 
         void displayData(ImageLink imageLink, @Nullable Bitmap image);
+
+        void scheduleDeleteLink(ImageLink imageLink, long delayMs);
+
+        void scheduleDownloadImage(ImageLink imageLink, String destinationPath, long delayMs);
+
+        void snackbarOk(String message);
+
+        void errorMessage(int resId);
     }
 
     public interface Presenter extends MvpPresenter<View>{

@@ -1,4 +1,4 @@
-package com.santoni7.interactiondemo.app_b;
+package com.santoni7.interactiondemo.app_b.data;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,8 +18,6 @@ public class RemoteImageDataSource {
         return Observable.<Bitmap>create(emitter -> {
             InputStream inputStream = null;
             try {
-
-                Thread.sleep(600);
                 URL url = new URL(urlString);
                 inputStream = url.openConnection().getInputStream();
                 Bitmap img = BitmapFactory.decodeStream(inputStream);

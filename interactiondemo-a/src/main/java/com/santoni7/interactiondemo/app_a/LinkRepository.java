@@ -21,40 +21,11 @@ public class LinkRepository {
         this.dao = database.getImageLinkDao();
     }
 
-    public ImageLinkDao getDao() {
-        return dao;
-    }
-
     public Flowable<List<ImageLink>> getSortedLinks(Comparator<ImageLink> comparator) {
         return dao.getLinksFlowable()
                 .map(links -> {
                     Collections.sort(links, comparator);
                     return links;
                 });
-    }
-
-
-    public void insertAsync(ImageLink link) {
-//        Completable.fromAction(() -> dao.insert(link))
-//                .subscribeOn(Schedulers.io())
-//                .subscribe();
-
-        Observable.timer(500, TimeUnit.MILLISECONDS)
-                .map(o -> {
-                    dao.insert(link);
-                    return "";
-                })
-                .subscribe();
-    }
-
-    // TODO: Remove
-    public void clearAll() {
-        Observable.timer(500, TimeUnit.MILLISECONDS)
-                .map(o -> {
-                    dao.clearAll();
-                    return "";
-                })
-                .subscribe();
-
     }
 }

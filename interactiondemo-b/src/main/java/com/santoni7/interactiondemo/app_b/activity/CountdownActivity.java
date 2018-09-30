@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -69,13 +70,14 @@ public class CountdownActivity extends AppCompatActivity {
         textCountdown.setScaleY(initScale);
 
         textCountdown.setText(String.valueOf(countdownValue));
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.countdown_alert_text)
-                .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
-                    initTimer();
-                });
-        builder.create().show();
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setMessage(R.string.countdown_alert_text)
+//                .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
+//                    initTimer();
+//                });
+//        builder.create().show();
+        initTimer();
     }
 
     @Override
@@ -86,6 +88,8 @@ public class CountdownActivity extends AppCompatActivity {
             closeApp();
         }
     }
+
+
 
     private void initTimer() {
         disposables.add(
@@ -160,8 +164,8 @@ public class CountdownActivity extends AppCompatActivity {
         set.start();
     }
 
-
-    private void closeApp() {
+    @OnClick(R.id.btnCloseNow)
+    void closeApp() {
         disposables.dispose();
         finishAndRemoveTask();
     }
