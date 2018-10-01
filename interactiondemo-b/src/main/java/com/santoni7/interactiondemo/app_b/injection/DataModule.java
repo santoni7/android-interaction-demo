@@ -13,14 +13,14 @@ import dagger.Provides;
 
 @Module(includes = ContextModule.class)
 public class DataModule {
+    @AppBScope
     @Provides
-    @Singleton
     LinkContentRepository linkRepository(Context context){
         return new LinkContentRepository(context);
     }
 
+    @AppBScope
     @Provides
-    @Singleton
     BitmapSource bitmapSource(){
         return new RemoteBitmapSource();
     }

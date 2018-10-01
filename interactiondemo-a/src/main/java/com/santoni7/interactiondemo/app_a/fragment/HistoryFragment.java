@@ -4,6 +4,8 @@ package com.santoni7.interactiondemo.app_a.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,6 +21,8 @@ import com.santoni7.interactiondemo.lib.model.ImageLink;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -28,7 +32,7 @@ public class HistoryFragment extends Fragment implements ContractA.View.HistoryV
 
     private HistoryAdapter adapter = new HistoryAdapter(new ArrayList<>(), this);
 
-    private ContractA.Presenter presenter;
+    @Inject ContractA.Presenter presenter;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -41,7 +45,7 @@ public class HistoryFragment extends Fragment implements ContractA.View.HistoryV
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = ApplicationA.getComponent().providePresenter();
+        ApplicationA.getComponent().injectFragment(this);
     }
 
     @Override
@@ -57,6 +61,7 @@ public class HistoryFragment extends Fragment implements ContractA.View.HistoryV
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         return v;
     }
@@ -69,6 +74,7 @@ public class HistoryFragment extends Fragment implements ContractA.View.HistoryV
     @Override
     public void setLinks(List<ImageLink> links) {
         adapter.setLinks(links);
+        adapter.notifyDataSetChanged();
     }
 
 }

@@ -45,7 +45,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="textUri"
                 android:singleLine="false"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:text="http://andrewbalitski.com/santoni7/inspired/images/inspired.png"/>
 
         </android.support.design.widget.TextInputLayout>
 

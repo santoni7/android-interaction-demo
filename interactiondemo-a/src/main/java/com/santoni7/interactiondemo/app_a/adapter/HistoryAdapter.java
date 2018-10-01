@@ -1,6 +1,7 @@
 package com.santoni7.interactiondemo.app_a.adapter;
 
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,10 +12,16 @@ import android.widget.TextView;
 import com.santoni7.interactiondemo.app_a.R;
 import com.santoni7.interactiondemo.lib.model.ImageLink;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
     private List<ImageLink> links;
@@ -27,8 +34,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     public void setLinks(List<ImageLink> links) {
         this.links = links;
-        notifyDataSetChanged();
     }
+
 
     @NonNull
     @Override
@@ -47,6 +54,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public int getItemCount() {
         return links.size();
     }
+
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 

@@ -4,8 +4,6 @@ import android.content.Context;
 
 import com.santoni7.interactiondemo.app_a.ClipboardExceptionHandler;
 
-import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
 
@@ -22,7 +20,7 @@ public class ContextModule {
         return context.getApplicationContext();
     }
 
+    @AppAScope
     @Provides
-    @Singleton
-    public ClipboardExceptionHandler clipboardExceptionHandler() { return new ClipboardExceptionHandler(context); }
+    public Thread.UncaughtExceptionHandler exceptionHandler() { return new ClipboardExceptionHandler(context); }
 }

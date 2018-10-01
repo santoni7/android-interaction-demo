@@ -61,6 +61,17 @@ public class ImageLink {
                 linkId, url, status.toString(), timestamp.toString());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof ImageLink){
+            ImageLink l = (ImageLink) obj;
+            return this.getLinkId() == l.getLinkId()
+                    && this.getStatus() == l.getStatus()
+                    && this.getUrl().equals(l.getUrl())
+                    && this.getTimestamp().equals(l.timestamp);
+        }
+        return false;
+    }
 
     public static ImageLink fromContentValues(ContentValues values) {
         final ImageLink link = new ImageLink();

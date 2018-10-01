@@ -3,7 +3,6 @@ package com.santoni7.interactiondemo.app_b.activity;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -73,6 +72,7 @@ public class CountdownActivity extends AppCompatActivity {
         textCountdown.setText(String.valueOf(countdownValue));
 
         initTimer();
+
     }
 
     @Override
@@ -164,7 +164,7 @@ public class CountdownActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.btnOpenAppA)
-    void openAppA(){
+    void openAppA() {
 //        Intent launchIntent = getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.santoni7.interactiondemo.app_a.activity.ActivityA");
 //        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        startActivity(launchIntent);

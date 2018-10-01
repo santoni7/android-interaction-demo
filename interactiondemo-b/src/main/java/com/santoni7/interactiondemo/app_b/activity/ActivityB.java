@@ -30,6 +30,8 @@ import com.santoni7.interactiondemo.lib.model.ImageLink;
 
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -46,7 +48,7 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.main_content) CoordinatorLayout coordinatorLayout;
 
-    private ContractB.Presenter presenter;
+    @Inject ContractB.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +56,10 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
         setContentView(R.layout.activity_app_b);
         ButterKnife.bind(this);
 
+        ApplicationB.getComponent().inject(this);
 
         initView();
 
-        // todo inject repo
-        presenter = ApplicationB.getComponent().providePresenter();
         presenter.attachView(this);
         presenter.viewReady();
 
@@ -196,7 +197,7 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
             } else {
                 // No explanation needed; request the permission
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                         REQUEST_CODE_STORAGE_PERMISSIONS);
             }
         }

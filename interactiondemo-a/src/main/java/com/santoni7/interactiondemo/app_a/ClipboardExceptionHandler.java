@@ -26,7 +26,7 @@ public class ClipboardExceptionHandler implements Thread.UncaughtExceptionHandle
 
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
-        Log.e(TAG, "Lets See if it Works !!!");
+        Log.e(TAG, "Uncaught Exception handled: at " + thread + "\n\tError: " + throwable.getMessage());
         throwable.printStackTrace();
 
         Writer writer = new StringWriter();

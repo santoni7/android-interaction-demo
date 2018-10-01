@@ -19,16 +19,15 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.Toast;
 
 import com.santoni7.interactiondemo.app_a.ApplicationA;
-import com.santoni7.interactiondemo.app_a.ClipboardExceptionHandler;
 import com.santoni7.interactiondemo.app_a.R;
 import com.santoni7.interactiondemo.app_a.data.LinkSortingOrderEnum;
 import com.santoni7.interactiondemo.app_a.fragment.HistoryFragment;
 import com.santoni7.interactiondemo.app_a.fragment.TestFragment;
-import com.santoni7.interactiondemo.app_a.injection.ComponentA;
 import com.santoni7.interactiondemo.lib.AndroidUtils;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,7 +38,6 @@ public class ActivityA extends AppCompatActivity implements ContractA.View {
     private static final String SAVED_STATE_KEY_PAGE = "com.santoni7.interactiondemo.app_a.PAGE";
     private static final String SAVED_STATE_KEY_ORDER_BY = "com.santoni7.interactiondemo.app_a.ORDER_BY";
 
-    private ContractA.Presenter presenter;
 
     @BindView(R.id.viewPager) ViewPager viewPager;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -51,22 +49,22 @@ public class ActivityA extends AppCompatActivity implements ContractA.View {
 
     private LinkSortingOrderEnum linkOrder;
 
-    Thread.UncaughtExceptionHandler exceptionHandler;
+    @Inject Thread.UncaughtExceptionHandler exceptionHandler;
+    @Inject ContractA.Presenter presenter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: savedInstanceState=" + savedInstanceState);
         super.onCreate(savedInstanceState);
 
-        ComponentA component = ApplicationA.getComponent();
+        ApplicationA.getComponent().inject(this);
 
-        exceptionHandler = component.provideExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(exceptionHandler);
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        presenter = component.providePresenter();
         presenter.attachView(this);
 
         if(linkOrder == null) {
@@ -228,8 +226,6 @@ public class ActivityA extends AppCompatActivity implements ContractA.View {
 
     @Override
     public HistoryView getHistoryView() {
-
-        int b = 3 / 0;
         return (HistoryFragment) viewPagerAdapter.getItem(PagerState.HISTORY.ordinal());
     }
 

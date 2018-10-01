@@ -3,8 +3,8 @@ package com.santoni7.interactiondemo.app_b.service;
 import android.app.DownloadManager;
 import android.app.IntentService;
 import android.app.Notification;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Environment;
@@ -120,20 +120,22 @@ public class ContentIntentService extends IntentService {
         File dir;
         if (isExternalStorageWritable()) {
             dir = new File(Environment.getExternalStorageDirectory() + directory);
-            if (!dir.exists()) {
-                dir.mkdirs();
+            if (!dir.exists() && !dir.mkdirs()) {
+                Log.e(TAG, "Error: Could not make dir");
+                throw new IllegalStateException("Could not make dir: " + dir.getAbsolutePath());
             }
             request.setDestinationInExternalPublicDir(directory, fileName);
 
         } else {
             dir = new File(Environment.getRootDirectory() + directory);
-            if (!dir.exists()) {
-                dir.mkdirs();
+            if (!dir.exists() && !dir.mkdirs()) {
+                Log.e(TAG, "Error: Could not make dir");
+                throw new IllegalStateException("Could not make dir: " + dir.getAbsolutePath());
             }
             request.setDestinationUri(Uri.parse(dir.getAbsolutePath()));
         }
 
-        mgr.enqueue(request);
+        long downloadId = mgr.enqueue(request);
     }
 
     private boolean isExternalStorageWritable() {

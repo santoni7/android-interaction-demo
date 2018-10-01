@@ -1,6 +1,7 @@
 package com.santoni7.interactiondemo.app_a.activity;
 
 import android.content.Intent;
+import android.support.v7.util.DiffUtil;
 
 import com.santoni7.interactiondemo.app_a.data.LinkSortingOrderEnum;
 import com.santoni7.interactiondemo.lib.model.ImageLink;

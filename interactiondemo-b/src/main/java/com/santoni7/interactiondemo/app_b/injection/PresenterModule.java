@@ -12,8 +12,8 @@ import dagger.Provides;
 
 @Module(includes = DataModule.class)
 public class PresenterModule {
+    @AppBScope
     @Provides
-    @Singleton
     ContractB.Presenter presenter(LinkContentRepository repository, BitmapSource bitmapSource){
         return new PresenterB(repository, bitmapSource);
     }

@@ -18,6 +18,8 @@ import com.santoni7.interactiondemo.app_a.ApplicationA;
 import com.santoni7.interactiondemo.app_a.R;
 import com.santoni7.interactiondemo.app_a.activity.ContractA;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -31,7 +33,7 @@ public class TestFragment extends Fragment implements ContractA.View.TestView {
     @BindView(R.id.editText) TextInputEditText editText;
     @BindView(R.id.textInputLayout) TextInputLayout textInputLayout;
 
-    private ContractA.Presenter presenter;
+    @Inject ContractA.Presenter presenter;
 
     public TestFragment() {
     }
@@ -44,7 +46,7 @@ public class TestFragment extends Fragment implements ContractA.View.TestView {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        presenter = ApplicationA.getComponent().providePresenter();
+        ApplicationA.getComponent().injectFragment(this);
     }
 
     @Override
