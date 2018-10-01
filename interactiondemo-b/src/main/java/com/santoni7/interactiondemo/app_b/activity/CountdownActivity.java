@@ -163,18 +163,6 @@ public class CountdownActivity extends AppCompatActivity {
         finishAndRemoveTask();
     }
 
-    @OnClick(R.id.btnOpenAppA)
-    void openAppA() {
-//        Intent launchIntent = getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.santoni7.interactiondemo.app_a.activity.ActivityA");
-//        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(launchIntent);
-
-        Intent intent = new Intent("com.santoni7.interactiondemo.app_a.activity.ActivityA");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
-        closeApp();
-    }
 
     @Override
     protected void onStop() {
