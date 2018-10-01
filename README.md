@@ -9,6 +9,11 @@ Anton Sakhniuk:  anton.sakhniuk@gmail.com
 - App B CountdownActivity: custom pulsing ring animation for timer
 - Disappearing sorting icon on ActivityA AppBar
 - Uses Dagger to allow easily replace some components
+## Screenshots
+<img border="1" width="250" src="/screenshots/test_view.jpg" alt="App B"/> <img width="250" src="/screenshots/history_view.jpg" alt="App B"/> <img width="250" src="/screenshots/app_b.jpg" alt="App B"/>
+<img width="250" src="/screenshots/notification.jpg" alt="App B"/>
+
+
 ## Package structure
         com.santoni7.interactiondemo
             ├── app_a  ------------------------------------ Application A
