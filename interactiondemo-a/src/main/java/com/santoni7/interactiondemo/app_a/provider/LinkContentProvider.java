@@ -10,14 +10,14 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.santoni7.interactiondemo.app_a.ApplicationA;
+import com.santoni7.interactiondemo.app_a.data.ImageLinkDao;
 import com.santoni7.interactiondemo.lib.CommonConst;
 import com.santoni7.interactiondemo.lib.model.ImageLink;
-import com.santoni7.interactiondemo.app_a.data.ImageLinkDao;
-import com.santoni7.interactiondemo.app_a.data.ImageLinkDatabase;
 
 /**
  * A ContentProvider based on ImageLinkDatabase.
- * Used to share
+ * It is needed to allow other applications (like App B) to access database of this app.
  */
 public class LinkContentProvider extends ContentProvider {
 
@@ -45,7 +45,7 @@ public class LinkContentProvider extends ContentProvider {
             Context ctx = getContext();
             if (ctx == null) return null;
 
-            final ImageLinkDao dao = ImageLinkDatabase.getDatabase(ctx).getImageLinkDao();
+            final ImageLinkDao dao = ApplicationA.getComponent().provideDatabase().getImageLinkDao();
             final Cursor cursor;
 
             if (code == CODE_LINKS_ALL) {
@@ -80,13 +80,14 @@ public class LinkContentProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
         switch (MATCHER.match(uri)) {
             case CODE_LINKS_ALL:
+                final ImageLinkDao dao = ApplicationA.getComponent().provideDatabase().getImageLinkDao();
                 final Context ctx = getContext();
                 if (ctx == null || contentValues == null) {
                     return null;
                 }
 
                 final ImageLink link = ImageLink.fromContentValues(contentValues);
-                final long id = ImageLinkDatabase.getDatabase(ctx).getImageLinkDao().insert(link);
+                final long id = dao.insert(link);
 
                 ctx.getContentResolver().notifyChange(uri, null);
                 return ContentUris.withAppendedId(uri, id);
@@ -105,13 +106,13 @@ public class LinkContentProvider extends ContentProvider {
             case CODE_LINKS_ALL:
                 throw new IllegalArgumentException("Must specify ID in URI: " + uri);
             case CODE_LINKS_SINGLE:
+                final ImageLinkDao dao = ApplicationA.getComponent().provideDatabase().getImageLinkDao();
                 final Context ctx = getContext();
                 if (ctx == null) {
                     return 0;
                 }
 
-                final int count = ImageLinkDatabase.getDatabase(ctx).getImageLinkDao()
-                        .delete(ContentUris.parseId(uri));
+                final int count = dao.delete(ContentUris.parseId(uri));
 
                 ctx.getContentResolver().notifyChange(uri, null);
                 return count;
@@ -127,6 +128,7 @@ public class LinkContentProvider extends ContentProvider {
             case CODE_LINKS_ALL:
                 throw new IllegalArgumentException("Must specify ID in URI: " + uri);
             case CODE_LINKS_SINGLE:
+                final ImageLinkDao dao = ApplicationA.getComponent().provideDatabase().getImageLinkDao();
                 final Context ctx = getContext();
                 if (ctx == null || contentValues == null) {
                     return 0;
@@ -134,8 +136,7 @@ public class LinkContentProvider extends ContentProvider {
 
                 final ImageLink link = ImageLink.fromContentValues(contentValues);
                 link.setLinkId(ContentUris.parseId(uri));
-                final int count = ImageLinkDatabase.getDatabase(ctx).getImageLinkDao()
-                        .update(link);
+                final int count = dao.update(link);
 
                 ctx.getContentResolver().notifyChange(uri, null);
                 return count;

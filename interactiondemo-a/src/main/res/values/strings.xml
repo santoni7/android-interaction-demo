@@ -13,5 +13,8 @@
     <string name="order_newer_first">New to old</string>
     <string name="order_by_status">By status</string>
     <string name="order_older_first">Old to new</string>
+    <string name="image_url">Image URL</string>
+    <string name="wrong_url_hint">Please specify correct URL</string>
+    <string name="btn_ok_text">Send to App B!</string>
 
 </resources>

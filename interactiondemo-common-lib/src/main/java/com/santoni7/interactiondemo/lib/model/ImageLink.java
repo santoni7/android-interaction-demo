@@ -9,7 +9,6 @@ import android.content.ContentValues;
 import com.santoni7.interactiondemo.lib.converters.DateConverter;
 import com.santoni7.interactiondemo.lib.converters.StatusConverter;
 
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -24,22 +23,25 @@ public class ImageLink {
     public static final String COLUMN_STATUS = "status";
     public static final String COLUMN_TIMESTAMP = "timestamp";
 
-
-
+    /**
+     * Possible statuses of image link in database
+     */
     public enum Status {
         LOADED(1), ERROR(2), UNKNOWN(3);
 
         private int code;
+
         Status(int code) {
             this.code = code;
         }
+
         public int getCode() {
             return code;
         }
     }
 
     /**
-     * Fiel
+     * Fields
      */
     @PrimaryKey(autoGenerate = true)
     private long linkId;
@@ -53,13 +55,11 @@ public class ImageLink {
     private Status status;
 
 
-
     @Override
     public String toString() {
         return String.format(Locale.getDefault(), "Link#%d: {url: '%s', status: '%s', timestamp: '%s'}",
                 linkId, url, status.toString(), timestamp.toString());
     }
-
 
 
     public static ImageLink fromContentValues(ContentValues values) {
@@ -74,15 +74,15 @@ public class ImageLink {
             link.setStatus(StatusConverter.intToStatus(values.getAsInteger(COLUMN_STATUS)));
         }
         if (values.containsKey(COLUMN_TIMESTAMP)) {
-            link.setTimestamp(DateConverter.fromTimestamp(values.getAsLong(COLUMN_TIMESTAMP)));
+            link.setTimestamp(DateConverter.timestampToDate(values.getAsLong(COLUMN_TIMESTAMP)));
         }
         return link;
     }
 
-    public static ContentValues toContentValues(ImageLink link){
+    public static ContentValues toContentValues(ImageLink link) {
         final ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_ID, link.getLinkId());
-        contentValues.put(COLUMN_STATUS, StatusConverter.fromStatus(link.getStatus()));
+        contentValues.put(COLUMN_STATUS, StatusConverter.statusToInt(link.getStatus()));
         contentValues.put(COLUMN_TIMESTAMP, DateConverter.dateToTimestamp(link.getTimestamp()));
         contentValues.put(COLUMN_URL, link.getUrl());
         return contentValues;

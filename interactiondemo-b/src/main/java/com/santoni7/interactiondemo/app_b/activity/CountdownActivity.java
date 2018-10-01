@@ -3,10 +3,11 @@ package com.santoni7.interactiondemo.app_b.activity;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.AnticipateInterpolator;
 import android.widget.ImageView;
@@ -70,13 +71,7 @@ public class CountdownActivity extends AppCompatActivity {
         textCountdown.setScaleY(initScale);
 
         textCountdown.setText(String.valueOf(countdownValue));
-//
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setMessage(R.string.countdown_alert_text)
-//                .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
-//                    initTimer();
-//                });
-//        builder.create().show();
+
         initTimer();
     }
 
@@ -88,7 +83,6 @@ public class CountdownActivity extends AppCompatActivity {
             closeApp();
         }
     }
-
 
 
     private void initTimer() {
@@ -108,7 +102,7 @@ public class CountdownActivity extends AppCompatActivity {
     private void onTick() {
         if (countdownValue == 0) {
             return;
-        } else if(countdownValue == 1){
+        } else if (countdownValue == 1) {
             textTitle.setText(R.string.goodbye);
         }
         // Set minimum TextView scale to leave it readable
@@ -153,7 +147,6 @@ public class CountdownActivity extends AppCompatActivity {
         AnimatorSet backward = new AnimatorSet();
         backward.playTogether(animatorXBack, animatorYBack);
 
-//        TimeInterpolator interpolator = new AccelerateDecelerateInterpolator();
         TimeInterpolator interpolator = new AnticipateInterpolator();
         forward.setInterpolator(interpolator);
         backward.setInterpolator(interpolator);
@@ -168,6 +161,19 @@ public class CountdownActivity extends AppCompatActivity {
     void closeApp() {
         disposables.dispose();
         finishAndRemoveTask();
+    }
+
+    @OnClick(R.id.btnOpenAppA)
+    void openAppA(){
+//        Intent launchIntent = getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.santoni7.interactiondemo.app_a.activity.ActivityA");
+//        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(launchIntent);
+
+        Intent intent = new Intent("com.santoni7.interactiondemo.app_a.activity.ActivityA");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        closeApp();
     }
 
     @Override

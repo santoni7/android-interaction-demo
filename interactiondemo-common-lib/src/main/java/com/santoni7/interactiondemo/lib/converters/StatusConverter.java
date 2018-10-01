@@ -7,7 +7,7 @@ import com.santoni7.interactiondemo.lib.model.ImageLink;
 public class StatusConverter {
 
     @TypeConverter
-    public static int fromStatus(ImageLink.Status status) {
+    public static int statusToInt(ImageLink.Status status) {
         return status.getCode();
     }
 

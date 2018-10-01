@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class DateConverter {
     @TypeConverter
-    public static Date fromTimestamp(Long value) {
+    public static Date timestampToDate(Long value) {
         return value == null ? null : new Date(value);
     }
 

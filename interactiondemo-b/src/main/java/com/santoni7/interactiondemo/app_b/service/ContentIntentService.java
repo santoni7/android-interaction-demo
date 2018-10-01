@@ -11,19 +11,15 @@ import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
+import com.santoni7.interactiondemo.app_b.Constants;
 import com.santoni7.interactiondemo.app_b.R;
 import com.santoni7.interactiondemo.app_b.data.LinkContentRepository;
 
 import java.io.File;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
+
 public class ContentIntentService extends IntentService {
     private static final String TAG = ContentIntentService.class.getSimpleName();
 
@@ -34,11 +30,7 @@ public class ContentIntentService extends IntentService {
     private static final String EXTRA_IMAGE_URL = "com.santoni7.interactiondemo.app_b.extra.IMAGE_URL";
     private static final String EXTRA_DOWNLOAD_PATH = "com.santoni7.interactiondemo.app_b.extra.DOWNLOAD_PATH";
 
-    public static final String NOTIFICATON_CHANNEL_ID = "com.santoni7.interactiondemo.app_b.DEFAULT_CHANNEL";
-
     private static final int NOTIFICATION_LINK_DELETED_ID = 1000;
-//    private static final int NOTIFICATION_IMAGE_DOWNLOAD_ID = 2000;
-
 
     public ContentIntentService() {
         super("ContentIntentService");
@@ -46,7 +38,7 @@ public class ContentIntentService extends IntentService {
 
 
     /**
-     * Build an Intent that starts this service with specified parameter
+     * Build an Intent that starts this service to remove linkId from database
      */
     public static Intent buildIntentActionDeleteLink(Context context, long linkId) {
         Intent intent = new Intent(context, ContentIntentService.class);
@@ -56,7 +48,7 @@ public class ContentIntentService extends IntentService {
     }
 
     /**
-     * Build an Intent that starts this service with specified parameter
+     * Build an Intent that starts this service to download image to external storage
      */
     public static Intent buildIntentActionDownloadImage(Context context, long linkId, String url, String downloadPath) {
         Intent intent = new Intent(context, ContentIntentService.class);
@@ -108,19 +100,22 @@ public class ContentIntentService extends IntentService {
     }
 
 
-
     private void handleDownloadImage(long linkId, String url, String directory) {
         final DownloadManager mgr = (DownloadManager) getApplicationContext().getSystemService(Context.DOWNLOAD_SERVICE);
         if (mgr == null) return;
 
         final Uri downloadUri = Uri.parse(url);
         final String fileName = downloadUri.getLastPathSegment();
+        final String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        Log.d(TAG, "Extension: " + extension);
+        Log.d(TAG, "MimeType: " + MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
 
         final DownloadManager.Request request = new DownloadManager.Request(downloadUri);
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
-                .setAllowedOverRoaming(false).setTitle("ImageLink#" + linkId + ": " + fileName)
+                .setTitle(getString(R.string.download_manager_title_format, linkId, fileName))
                 .setDescription(url)
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setMimeType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
 
         File dir;
         if (isExternalStorageWritable()) {
@@ -149,7 +144,7 @@ public class ContentIntentService extends IntentService {
     private NotificationCompat.Builder getBuilder() {
         final Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        return new NotificationCompat.Builder(this, NOTIFICATON_CHANNEL_ID)
+        return new NotificationCompat.Builder(this, Constants.NOTIFICATON_CHANNEL_ID)
                 .setAutoCancel(true)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setSound(alarmSound)

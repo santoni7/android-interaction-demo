@@ -2,12 +2,12 @@ package com.santoni7.interactiondemo.app_b.activity;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -20,11 +20,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.santoni7.interactiondemo.app_b.service.ContentIntentService;
-import com.santoni7.interactiondemo.app_b.data.LinkContentRepository;
+import com.santoni7.interactiondemo.app_b.ApplicationB;
 import com.santoni7.interactiondemo.app_b.R;
+import com.santoni7.interactiondemo.app_b.service.ContentIntentService;
 import com.santoni7.interactiondemo.lib.AndroidUtils;
 import com.santoni7.interactiondemo.lib.CommonConst;
 import com.santoni7.interactiondemo.lib.model.ImageLink;
@@ -43,6 +42,7 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
     @BindView(R.id.cardView) CardView cardView;
     @BindView(R.id.progressBar) ProgressBar progressBar;
     @BindView(R.id.txtUrl) TextView textViewUrl;
+    @BindView(R.id.txtStatus) TextView textViewStatus;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.main_content) CoordinatorLayout coordinatorLayout;
 
@@ -58,7 +58,7 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
         initView();
 
         // todo inject repo
-        presenter = new PresenterB(new LinkContentRepository(getApplicationContext()));
+        presenter = ApplicationB.getComponent().providePresenter();
         presenter.attachView(this);
         presenter.viewReady();
 
@@ -66,7 +66,6 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
 
         checkPermissions();
     }
-
 
     private void initView() {
         setSupportActionBar(toolbar);
@@ -84,10 +83,10 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
 
             presenter.onActionOpenLink(id);
         } else {
-            // TODO: ERROR: Wrong action provided
-            errorMessage(R.string.error_wrong_action);
+            showMessage(ContractB.Message.ERR_WRONG_ACTIVITY_ACTION);
         }
     }
+
 
     @Override
     public void showProgressBar() {
@@ -101,16 +100,8 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
         progressBar.setVisibility(View.GONE);
         imageView.setVisibility(View.VISIBLE);
         textViewUrl.setVisibility(View.VISIBLE);
-
-        final int FADE_IN_DURATION = 600;
-        AndroidUtils.animateViewFadeIn(textViewUrl, FADE_IN_DURATION);
-        AndroidUtils.animateViewFadeIn(imageView, FADE_IN_DURATION);
     }
 
-    @Override
-    public void errorMessage(int resId) {
-        Toast.makeText(this, resId, Toast.LENGTH_LONG).show();
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -123,16 +114,35 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
     }
 
 
-
     @Override
     public void displayData(ImageLink imageLink, Bitmap image) {
         textViewUrl.setText(imageLink.getUrl());
-        toolbar.setSubtitle("ImageLink#" + imageLink.getLinkId());
+
+        switch (imageLink.getStatus()) {
+            case UNKNOWN:
+                textViewStatus.setText(R.string.status_unknown);
+                break;
+            case ERROR:
+                textViewStatus.setText(R.string.status_error);
+                break;
+            case LOADED:
+                textViewStatus.setText(R.string.status_loaded);
+                break;
+        }
+
+        toolbar.setSubtitle(getString(R.string.toolbar_subtitle_format, imageLink.getLinkId()));
         if (image != null) {
+            cardView.setCardElevation(8);
             imageView.setImageBitmap(image);
         } else {
+            cardView.setCardElevation(0);
             imageView.setImageResource(R.mipmap.icon_warning);
         }
+
+        final int FADE_IN_DURATION = 700;
+        AndroidUtils.animateViewFadeIn(textViewUrl, FADE_IN_DURATION);
+        AndroidUtils.animateViewFadeIn(cardView, FADE_IN_DURATION);
+        AndroidUtils.animateViewFadeIn(textViewStatus, FADE_IN_DURATION);
     }
 
     @Override
@@ -160,12 +170,15 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
         }
     }
 
-    @Override
-    public void snackbarOk(String message) {
-        Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).setAction(R.string.ok, v -> {
+    public void snackbarOk(int resId) {
+        Snackbar.make(coordinatorLayout, resId, Snackbar.LENGTH_LONG).setAction(R.string.ok, v -> {
         }).show();
     }
 
+    @Override
+    public void showMessage(ContractB.Message message) {
+        snackbarOk(message.getId());
+    }
 
     private void checkPermissions() {
         if (ContextCompat.checkSelfPermission(this,
@@ -175,32 +188,16 @@ public class ActivityB extends AppCompatActivity implements ContractB.View {
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
+                // Show alert dialog
+                new AlertDialog.Builder(this)
+                        .setMessage(R.string.alert_ask_permissions)
+                        .setNeutralButton(R.string.ok, (dialogInterface, i) -> dialogInterface.dismiss())
+                        .show();
             } else {
                 // No explanation needed; request the permission
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         REQUEST_CODE_STORAGE_PERMISSIONS);
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_STORAGE_PERMISSIONS: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
             }
         }
     }

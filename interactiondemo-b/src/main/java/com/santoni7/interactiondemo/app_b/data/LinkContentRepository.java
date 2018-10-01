@@ -10,14 +10,15 @@ import com.santoni7.interactiondemo.lib.converters.DateConverter;
 import com.santoni7.interactiondemo.lib.converters.StatusConverter;
 import com.santoni7.interactiondemo.lib.model.ImageLink;
 
-import io.reactivex.Observable;
+import javax.inject.Inject;
+
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class LinkContentRepository {
     private Context ctx;
 
+    @Inject
     public LinkContentRepository(Context ctx) {
         this.ctx = ctx;
     }
@@ -41,7 +42,7 @@ public class LinkContentRepository {
                 link = new ImageLink();
                 link.setLinkId(cursor.getLong(colId));
                 link.setStatus(StatusConverter.intToStatus(cursor.getInt(colStatus)));
-                link.setTimestamp(DateConverter.fromTimestamp(cursor.getLong(colTimestamp)));
+                link.setTimestamp(DateConverter.timestampToDate(cursor.getLong(colTimestamp)));
                 link.setUrl(cursor.getString(colUrl));
             }
             cursor.close();

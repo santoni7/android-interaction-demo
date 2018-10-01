@@ -18,10 +18,10 @@
         android:text="10"
         android:textSize="24sp"
         android:textStyle="bold|italic"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/pulsingProgress"
+        app:layout_constraintEnd_toEndOf="@+id/pulsingProgress"
+        app:layout_constraintStart_toStartOf="@+id/pulsingProgress"
+        app:layout_constraintTop_toTopOf="@+id/pulsingProgress" />
 
 
     <ImageView
@@ -39,7 +39,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.35000002" />
 
     <TextView
         android:id="@+id/textViewTitle"
@@ -54,18 +55,35 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/btnCloseNow"
-        style="@style/Base.Widget.AppCompat.Button.ButtonBar.AlertDialog"
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="64dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="@string/close_now"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/btnCloseNow"
+            style="@style/Base.Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/close_now" />
+
+        <Button
+            android:id="@+id/btnOpenAppA"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_toEndOf="@+id/btnCloseNow"
+            android:text="@string/btn_open_app_a" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/textView"
@@ -77,7 +95,7 @@
         android:text="@string/countdown_alert_text"
         android:textAlignment="center"
         android:textStyle="italic"
-        app:layout_constraintBottom_toTopOf="@+id/btnCloseNow"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />

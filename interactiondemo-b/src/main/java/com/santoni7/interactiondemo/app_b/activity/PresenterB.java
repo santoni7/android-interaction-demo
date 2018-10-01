@@ -4,13 +4,17 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.santoni7.interactiondemo.app_b.Constants;
-import com.santoni7.interactiondemo.app_b.R;
+import com.santoni7.interactiondemo.app_b.data.BitmapSource;
 import com.santoni7.interactiondemo.app_b.data.LinkContentRepository;
-import com.santoni7.interactiondemo.app_b.data.RemoteImageDataSource;
 import com.santoni7.interactiondemo.lib.model.ImageLink;
 import com.santoni7.interactiondemo.lib.mvp.PresenterBase;
 
+import java.io.FileNotFoundException;
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.util.Calendar;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.Nullable;
@@ -18,15 +22,17 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class PresenterB extends PresenterBase<ContractB.View> implements ContractB.Presenter {
 
-
+    private static final String TAG = PresenterB.class.getSimpleName();
     private LinkContentRepository repository;
-    private RemoteImageDataSource imageDataSource;
+    private BitmapSource imageDataSource;
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
-    public PresenterB(LinkContentRepository contentRepository) {
+
+    @Inject
+    public PresenterB(LinkContentRepository contentRepository, BitmapSource bitmapSource) {
         this.repository = contentRepository;
-        this.imageDataSource = new RemoteImageDataSource();
+        this.imageDataSource = bitmapSource;
     }
 
     @Override
@@ -47,7 +53,7 @@ public class PresenterB extends PresenterBase<ContractB.View> implements Contrac
                     imageLink.setLinkId(id);
                     loadAndDisplayImage(imageLink);
                 }, err -> {
-                    getView().errorMessage(R.string.error_while_inserting);
+                    getView().showMessage(ContractB.Message.ERR_INSERTING_LINK);
                 }));
     }
 
@@ -59,15 +65,17 @@ public class PresenterB extends PresenterBase<ContractB.View> implements Contrac
                 .subscribe(imageLink -> {
                     // Schedule remove link with "green" status
                     if (imageLink.getStatus() == ImageLink.Status.LOADED) {
-                        Log.d("PresenterB", "Scheduled service execution for id=" + id + "; link=" + imageLink);
+                        Log.d(TAG, "Scheduled service execution for id=" + id + "; link=" + imageLink);
 
                         getView().scheduleDeleteLink(imageLink, Constants.SERVICE_EXECUTION_DELAY_MS);
                         getView().scheduleDownloadImage(imageLink, Constants.IMAGE_SAVE_PATH, Constants.SERVICE_EXECUTION_DELAY_MS);
-                        getView().snackbarOk("Service scheduled.");
+                        getView().showMessage(ContractB.Message.SERVICE_SCHEDULED);
                     }
                     loadAndDisplayImage(imageLink);
                 }, err -> {
-                    getView().errorMessage(R.string.error_fetching_link_from_db);
+                    Log.e(TAG, "Error fetching link from database");
+                    err.printStackTrace();
+                    getView().showMessage(ContractB.Message.ERR_FETCHING_LINK);
                 }));
     }
 
@@ -76,7 +84,30 @@ public class PresenterB extends PresenterBase<ContractB.View> implements Contrac
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(getView()::hideProgressBar)
                 .subscribe(img -> this.imageReceived(imageLink, img),
-                        err -> this.imageReceived(imageLink, null)));
+                        err -> {
+                            if(err instanceof FileNotFoundException){
+                                getView().showMessage(ContractB.Message.ERR_FILE_NOT_FOUND);
+                            } else if(err instanceof UnknownHostException) {
+                                getView().showMessage(ContractB.Message.ERR_UNKNOWN_HOST);
+                            } else if(err instanceof NullPointerException) {
+                                getView().showMessage(ContractB.Message.ERR_NULL_RESPONSE);
+                            } else if(err instanceof ConnectException) {
+                                getView().showMessage(ContractB.Message.ERR_CONNECTION_REFUSED);
+                            }
+                            Log.d(TAG, "Error downloading image: " + err);
+                            err.printStackTrace();
+                            this.imageReceived(imageLink, null);
+                        }));
+    }
+
+    private void update(ImageLink imageLink) {
+        disposables.add(repository.update(imageLink)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((affected, err) -> {
+                    if (affected == 0 || err != null) {
+                        getView().showMessage(ContractB.Message.ERR_UPDATING_LINK);
+                    }
+                }));
     }
 
     private void imageReceived(ImageLink imageLink, @Nullable Bitmap bitmap) {
@@ -88,14 +119,7 @@ public class PresenterB extends PresenterBase<ContractB.View> implements Contrac
 
         getView().displayData(imageLink, bitmap);
 
-        // todo subscribe and display success/error messages
-        disposables.add(repository.update(imageLink)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((affected, err) -> {
-                    if (affected == 0 || err != null){
-                        getView().errorMessage(R.string.error_updating_link);
-                    }
-                }));
+        update(imageLink);
     }
 
     @Override

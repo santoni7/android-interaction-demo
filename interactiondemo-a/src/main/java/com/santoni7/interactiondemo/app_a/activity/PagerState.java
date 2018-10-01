@@ -8,15 +8,13 @@ import com.santoni7.interactiondemo.app_a.fragment.TestFragment;
  * Describes possible viewpager states (pages) and their titles
  */
 public enum PagerState {
-    TEST(R.string.test_title, TestFragment.class),
-    HISTORY(R.string.history_title, HistoryFragment.class);
+    TEST(R.string.test_title),
+    HISTORY(R.string.history_title);
 
     private int titleResId;
-    private Class<?> clazz;
 
-    PagerState(int titleResId, Class<?> clazz) {
+    PagerState(int titleResId) {
         this.titleResId = titleResId;
-        this.clazz = clazz;
     }
 
     public static PagerState fromPosition(int pos){
@@ -28,9 +26,5 @@ public enum PagerState {
 
     public int getTitleResId() {
         return titleResId;
-    }
-
-    public Class<?> getClazz() {
-        return clazz;
     }
 }

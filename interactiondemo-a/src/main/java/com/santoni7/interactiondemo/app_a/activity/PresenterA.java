@@ -1,29 +1,41 @@
 package com.santoni7.interactiondemo.app_a.activity;
 
 import android.content.Intent;
+import android.util.Log;
 
-import com.santoni7.interactiondemo.app_a.LinkRepository;
+import com.santoni7.interactiondemo.app_a.data.LinkRepository;
+import com.santoni7.interactiondemo.app_a.data.ImageLinkDatabase;
 import com.santoni7.interactiondemo.lib.CommonConst;
-import com.santoni7.interactiondemo.app_a.ImageLinkOrder;
+import com.santoni7.interactiondemo.app_a.data.LinkSortingOrderEnum;
 import com.santoni7.interactiondemo.lib.mvp.PresenterBase;
 import com.santoni7.interactiondemo.lib.model.ImageLink;
 
 import java.util.List;
 
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
+@Singleton
 public class PresenterA extends PresenterBase<ContractA.View> implements ContractA.Presenter {
     private static final String TAG = PresenterA.class.getSimpleName();
 
     private LinkRepository repository;
 
-    @Override
-    public void viewReady() {
-        repository = new LinkRepository(getView().getDatabase());
+    @Inject
+    public PresenterA(LinkRepository repository){
+        this.repository = repository;
     }
 
     @Override
-    public void updateDataOrdered(ImageLinkOrder order) {
+    public void viewReady() {
+
+    }
+
+    @Override
+    public void updateDataOrdered(LinkSortingOrderEnum order) {
         disposables.add(
                 repository.getSortedLinks(order.getComparator())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -31,6 +43,7 @@ public class PresenterA extends PresenterBase<ContractA.View> implements Contrac
     }
 
     private void onDataUpdated(List<ImageLink> imageLinks) {
+        Log.d(TAG, "Data updated: " + imageLinks);
         getView().getHistoryView().setLinks(imageLinks);
     }
 
@@ -48,12 +61,4 @@ public class PresenterA extends PresenterBase<ContractA.View> implements Contrac
         getView().startActivity(i);
     }
 
-    @Override
-    public void onPageSelected(PagerState pagerState) {
-        if(pagerState == PagerState.HISTORY){
-            getView().showMenuItemOrderBy();
-        } else {
-            getView().hideMenuItemOrderBy();
-        }
-    }
 }

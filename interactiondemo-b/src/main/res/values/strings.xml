@@ -7,12 +7,27 @@
     <string name="countdown_text_format">%1$d</string>
     <string name="app_will_be_closed_in">App will be closed in:</string>
     <string name="goodbye">Goodbye!</string>
+    <string name="alert_ask_permissions">Application needs permission to write to device storage, so that images could be saved.</string>
+
 
     <string name="channel_name">App B Notification Channel</string>
     <string name="channel_description">Service notifications</string>
     <string name="close_now">Close Now</string>
-    <string name="error_while_inserting">An error occured while inserting link into database.</string>
+
+    <string name="error_while_inserting">An error occurred while inserting link into database.</string>
     <string name="error_fetching_link_from_db">Could not get link from database</string>
     <string name="error_updating_link">Error while updating link status in database</string>
     <string name="error_wrong_action">Error: Wrong action provided.</string>
+    <string name="service_is_scheduled">Service is scheduled to run in 15s.</string>
+    <string name="file_url_not_found">Error: File URL not found.</string>
+    <string name="could_not_resolve_host">Error: Could not resolve host.</string>
+
+    <string name="toolbar_subtitle_format">ImageLink#%1$d</string>
+    <string name="download_manager_title_format">ImageLink#%1$d: %2$s</string>
+    <string name="status_unknown">Status: UNKNOWN</string>
+    <string name="status_error">Status: ERROR</string>
+    <string name="status_loaded">Status: LOADED</string>
+    <string name="btn_open_app_a">Open App A</string>
+    <string name="error_null_response">Error: Unable to read image from url.</string>
+    <string name="error_connection_refused">Error: Connection refused.</string>
 </resources>

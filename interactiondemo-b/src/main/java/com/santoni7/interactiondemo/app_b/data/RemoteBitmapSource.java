@@ -8,14 +8,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
-public class RemoteImageDataSource {
-    private final String TAG = RemoteImageDataSource.class.getSimpleName();
+public class RemoteBitmapSource implements BitmapSource {
+    private final String TAG = RemoteBitmapSource.class.getSimpleName();
 
-    public Observable<Bitmap> downloadImage(String urlString) {
-        return Observable.<Bitmap>create(emitter -> {
+    @Override
+    public Single<Bitmap> downloadImage(String urlString) {
+        return Single.<Bitmap>create(emitter -> {
             InputStream inputStream = null;
             try {
                 URL url = new URL(urlString);
@@ -23,8 +24,7 @@ public class RemoteImageDataSource {
                 Bitmap img = BitmapFactory.decodeStream(inputStream);
 
                 Log.d(TAG, "Bitmap successfully downloaded");
-                emitter.onNext(img);
-                emitter.onComplete();
+                emitter.onSuccess(img);
             } catch (IOException e) {
                 emitter.onError(e);
                 Log.e(TAG, "Exception occurred during execution: " + e);

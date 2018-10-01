@@ -2,9 +2,6 @@ package com.santoni7.interactiondemo.app_a.activity;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -23,22 +21,19 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Toast;
 
+import com.santoni7.interactiondemo.app_a.ApplicationA;
+import com.santoni7.interactiondemo.app_a.ClipboardExceptionHandler;
 import com.santoni7.interactiondemo.app_a.R;
-import com.santoni7.interactiondemo.app_a.base.BaseActivity;
+import com.santoni7.interactiondemo.app_a.data.LinkSortingOrderEnum;
 import com.santoni7.interactiondemo.app_a.fragment.HistoryFragment;
 import com.santoni7.interactiondemo.app_a.fragment.TestFragment;
-import com.santoni7.interactiondemo.app_a.data.ImageLinkDatabase;
+import com.santoni7.interactiondemo.app_a.injection.ComponentA;
 import com.santoni7.interactiondemo.lib.AndroidUtils;
-import com.santoni7.interactiondemo.app_a.ImageLinkOrder;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ActivityA extends BaseActivity implements ContractA.View {
+public class ActivityA extends AppCompatActivity implements ContractA.View {
 
     private static final String TAG = ActivityA.class.getSimpleName();
     private static final String SAVED_STATE_KEY_PAGE = "com.santoni7.interactiondemo.app_a.PAGE";
@@ -54,36 +49,28 @@ public class ActivityA extends BaseActivity implements ContractA.View {
 
     private MenuItem menuItemOrderBy;
 
-    private ImageLinkOrder linkOrder;
+    private LinkSortingOrderEnum linkOrder;
 
+    Thread.UncaughtExceptionHandler exceptionHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: savedInstanceState=" + savedInstanceState);
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler((paramThread, paramThrowable) -> {
-            Toast.makeText(ActivityA.this, "Error log copied to clipboard",Toast.LENGTH_LONG).show();
-            Log.e("Alert","Lets See if it Works !!!");
 
-            Writer writer = new StringWriter();
-            paramThrowable.printStackTrace(new PrintWriter(writer));
-            String stacktrace = writer.toString();
+        ComponentA component = ApplicationA.getComponent();
 
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText(paramThrowable.getMessage(), stacktrace);
-            if (clipboard != null) {
-                clipboard.setPrimaryClip(clip);
-            }
-        });
+        exceptionHandler = component.provideExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(exceptionHandler);
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        presenter = new PresenterA();
+        presenter = component.providePresenter();
         presenter.attachView(this);
 
         if(linkOrder == null) {
-            linkOrder = ImageLinkOrder.NEWER_FIRST;
+            linkOrder = LinkSortingOrderEnum.NEWER_FIRST;
         }
 
         initView();
@@ -130,19 +117,7 @@ public class ActivityA extends BaseActivity implements ContractA.View {
         presenter.updateDataOrdered(linkOrder);
 
         updateMenuItemOrderBy();
-
-
-//
-//        Handler h = new Handler(getMainLooper());
-//        h.post(() -> AndroidUtils.hideKeyboard(this));
     }
-
-    public void fragmentsUpdated() {
-        getHistoryView().setPresenter(presenter);
-        getTestView().setPresenter(presenter);
-    }
-
-
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -155,7 +130,7 @@ public class ActivityA extends BaseActivity implements ContractA.View {
                 viewPager.setCurrentItem(page);
             }
             if (savedInstanceState.containsKey(SAVED_STATE_KEY_ORDER_BY)) {
-                linkOrder = ImageLinkOrder.valueOf(savedInstanceState.getString(SAVED_STATE_KEY_ORDER_BY));
+                linkOrder = LinkSortingOrderEnum.valueOf(savedInstanceState.getString(SAVED_STATE_KEY_ORDER_BY));
                 Log.d(TAG, "onRestoreInstanceState(): has SAVED_STATE_KEY_ORDER_BY: order=" + linkOrder);
             }
         }
@@ -168,8 +143,6 @@ public class ActivityA extends BaseActivity implements ContractA.View {
         outState.putString(SAVED_STATE_KEY_ORDER_BY, linkOrder.name());
         super.onSaveInstanceState(outState);
     }
-
-
 
 
 
@@ -197,20 +170,21 @@ public class ActivityA extends BaseActivity implements ContractA.View {
             case R.id.action_order_by_date:
             case R.id.action_order_by_date_reversed:
             case R.id.action_order_by_status:
-                linkOrder = ImageLinkOrder.fromMenuItemId(item.getItemId());
+                linkOrder = LinkSortingOrderEnum.fromMenuItemId(item.getItemId());
                 presenter.updateDataOrdered(linkOrder);
                 break;
         }
 
         SubMenu subMenu = menuItemOrderBy.getSubMenu();
         markOrderInMenu(subMenu, linkOrder);
+        updateMenuItemOrderBy();
         return super.onOptionsItemSelected(item);
     }
 
     /**
      * Adds icon to selected item, and removes from others, if any
      */
-    private void markOrderInMenu(Menu menu, ImageLinkOrder order) {
+    private void markOrderInMenu(Menu menu, LinkSortingOrderEnum order) {
         for (int i = 0; i < menu.size(); ++i) {
             MenuItem menuItem = menu.getItem(i);
             if (menuItem.getItemId() == order.getMenuItemId()) {
@@ -219,11 +193,6 @@ public class ActivityA extends BaseActivity implements ContractA.View {
                 menuItem.setIcon(null);
             }
         }
-    }
-
-    @Override
-    public void toast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     private void updateMenuItemOrderBy() {
@@ -239,7 +208,6 @@ public class ActivityA extends BaseActivity implements ContractA.View {
         }
     }
 
-    @Override
     public void showMenuItemOrderBy() {
         if (menuItemOrderBy != null) {
             menuItemOrderBy.setEnabled(true);
@@ -249,7 +217,6 @@ public class ActivityA extends BaseActivity implements ContractA.View {
         }
     }
 
-    @Override
     public void hideMenuItemOrderBy() {
         if (menuItemOrderBy != null) {
             menuItemOrderBy.setEnabled(false);
@@ -261,17 +228,9 @@ public class ActivityA extends BaseActivity implements ContractA.View {
 
     @Override
     public HistoryView getHistoryView() {
+
+        int b = 3 / 0;
         return (HistoryFragment) viewPagerAdapter.getItem(PagerState.HISTORY.ordinal());
-    }
-
-    @Override
-    public TestView getTestView() {
-        return (TestFragment) viewPagerAdapter.getItem(PagerState.TEST.ordinal());
-    }
-
-    @Override
-    public ImageLinkDatabase getDatabase() {
-        return ImageLinkDatabase.getDatabase(getApplicationContext());
     }
 
 
@@ -311,7 +270,8 @@ public class ActivityA extends BaseActivity implements ContractA.View {
         @Override
         public void onPageSelected(int i) {
             AndroidUtils.hideKeyboard(ActivityA.this);
-            presenter.onPageSelected(PagerState.values()[i]);
+//            presenter.onPageSelected(PagerState.values()[i]);
+            updateMenuItemOrderBy();
         }
 
     };
@@ -334,7 +294,6 @@ public class ActivityA extends BaseActivity implements ContractA.View {
             Log.d(TAG_, "instantiateItem(..) called at position=" + position);
             Object item = super.instantiateItem(container, position);
             fragments[position] = (Fragment) item;
-            fragmentsUpdated();
             return item;
         }
 
@@ -344,8 +303,8 @@ public class ActivityA extends BaseActivity implements ContractA.View {
 
             Fragment frag = fragments[position];
 
+            // If fragment doesn't exist yet, create one
             if (frag == null) {
-                Log.d(TAG_, "getItem(): fragments[position] is null, creating new instance");
                 PagerState stateEnum = PagerState.fromPosition(position);
                 switch (stateEnum) {
                     case TEST:
@@ -355,11 +314,10 @@ public class ActivityA extends BaseActivity implements ContractA.View {
                         frag = HistoryFragment.newInstance();
                         break;
                     default:
-                        Log.e(TAG, "ERROR: Not all possible states are processed in ViewPagerAdapter.getItem()");
+                        Log.e(TAG_, "ERROR: Not all possible states are processed in ViewPagerAdapter.getItem()");
                         throw new IllegalStateException("Not all possible states are processed in ViewPagerAdapter.getItem()");
                 }
                 fragments[position] = frag;
-                fragmentsUpdated();
             }
             return frag;
         }

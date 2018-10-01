@@ -55,7 +55,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         @BindView(R.id.txtLinkUrl) TextView url;
         @BindView(R.id.txtDateUpdated) TextView dateUpdated;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
